@@ -178,9 +178,13 @@ class LiCommand(object):
     def delete_linode(self, linode_id):
         instances = self.list_instances()
 
-        for li in instances:
-            if li.id == linode_id:
-                li.delete()
+        try:
+            for li in instances:
+                if li.id == linode_id:
+                    li.delete()
+
+        except Exception as e:
+            print("error with deletion of instance",e)
 
 
 

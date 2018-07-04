@@ -11,13 +11,13 @@ import utils
 
 server_re = re.compile(r'server\s+([a-zA-Z0-9]+)\s+(\d+\.\d+\.\d+\.\d+)\:(\d+)*')
 network_test_cmd = 'nc %s %d -w 5 -zv 2>/dev/null'
-squid_restart_cmd = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@%s "sudo squid3 -f /etc/squid3/squid.conf"'
+squid_restart_cmd = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s "sudo squid3 -f /etc/squid3/squid.conf"'
 
 def parse_config(filename='/etc/haproxy/haproxy.cfg'):
     """ Parse HAproxy configuration file """
 
     restarted = {}
-    
+
     for line in open(filename).readlines():
         line = line.strip()
         if line == '': continue
@@ -41,11 +41,11 @@ def parse_config(filename='/etc/haproxy/haproxy.cfg'):
 def main():
 
     utils.daemonize('monitor.pid', logfile='monitor.log')
-    
+
     while True:
         parse_config()
         time.sleep(300)
-        
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv)>1:
