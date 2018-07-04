@@ -16,7 +16,7 @@ import signal
 import json
 import email_report
 
-from utils import daemonize, randpass, enum, LinodeCommand, AWSCommand
+from utils import daemonize, randpass, enum, LiCommand, AWSCommand
 from botocore.exceptions import ClientError
 
 # Rotation Policies
@@ -328,23 +328,18 @@ class ProxyRotator(object):
             return '.'.join(map(lambda x: str(random.randrange(20, 100)), range(4))), random.randrange(10000,
                                                                                                        50000)
                 
-        tup = (region,
-               self.config.plan_id,
-               self.config.os_id,
-               self.config.image_id,
-               'proxy_disk',
-               randpass())
         
+
         print 'Making new linode in region',region,'...'        
-        data = self.linode_cmd.linode_create(*tup)
+        new_linode, password = self.linode_cmd.create_li()
         
         # data = os.popen(cmd).read()
         if verbose:
-            print data
+            print new_linode
         # The IP is the last line of the command
-        ip = data.strip().split('\n')[-1].strip().split()[-1].strip()
+        ip = new_linode.ipv4[0]
         # Proxy ID
-        pid = data.strip().split('\n')[-3].strip().split()[-1].strip()
+        pid = new_linode.id
         print 'I.P address of new linode is',ip
         print 'ID of new linode is',pid
         # Post process the host
