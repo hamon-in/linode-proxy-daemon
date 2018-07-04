@@ -6,6 +6,7 @@ import pwd
 import uuid
 import functools
 import boto3
+from linode_api4 import LinodeClient
 
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
@@ -35,7 +36,7 @@ class Log(object):
 
 def drop_privileges(uid_name='alpha', gid_name='alpha'):
     """ Drop privileges of current process to given user and group """
-    
+
     if os.getuid() != 0:
         # We're not root so, like, whatever dude
         return
@@ -54,10 +55,10 @@ def drop_privileges(uid_name='alpha', gid_name='alpha'):
 
     # Ensure a very conservative umask
     old_umask = os.umask(077)
-    
+
 def daemonize(pidfile, logfile=None, user='ubuntu', drop=True):
     """ Make a daemon with the given pidfile and optional logfile """
-    
+
     # Disconnect from controlling TTY as a service
     try:
         pid = os.fork()
@@ -86,7 +87,7 @@ def daemonize(pidfile, logfile=None, user='ubuntu', drop=True):
     # Drop privileges to given user by default
     if drop:
         drop_privileges(user, user)
-    
+
     # Redirect stdout/stderr to log file
     if logfile != None:
         log=Log(open(logfile,'a'))
@@ -109,7 +110,7 @@ class LinodeCommand(object):
                              }
         # Dynamically create command methods
         self.dyn_create()
-                             
+
     def _run(self, command, *args):
         """ Run a command and return the output """
 
@@ -130,12 +131,52 @@ class LinodeCommand(object):
             method = functools.partial(self._run, cmd)
             if self.verbose: print 'Dyn-creating method',method_name,'...'
             setattr(self, method_name, method)
-            
+
     def get_label(self, linode_id):
         """ Return the label, given the linode id """
 
         data = self.linode_info(linode_id)
         return data.split('\n')[0].split(':')[-1].strip()
+
+class LiCommand(object):
+    def __init__(self, config=None):
+        self.config = config
+        self.client = LinodeClient(self.config.token)
+        self.available_regions = self.client.regions()
+        self.ltypes = self.client.linode.types()
+        self.images = self.client.images()
+
+    def create_li(self, chosen_region = None):
+        if not chosen_region:
+            chosen_region = self.available_regions[0]
+        new_linode, password = self.client.linode.instance_create(ltype=self.config.plan,
+                                                    region = chosen_region,
+                                                    image = 'linode/debian9',
+                                                    group = self.config.group)
+
+        return new_linode, password
+
+
+    def list_instances(self):
+
+        return = self.client.linode.instances(Instance.group == self.config.group)
+
+
+    def get_label(self, linode_id):
+        instances = self.list_instances()
+
+        for li in instances:
+            if li.id == linode_id:
+                return li.label
+
+    def delete_linode(self, linode_id):
+        instances = self.list_instances()
+
+        for li in instances:
+            if li.id == linode_id:
+                li.delete()
+
+
 
 class AWSCommand(object):
     '''Class encapsulating the aws ec2 API'''
@@ -165,4 +206,4 @@ if __name__ == "__main__":
     l = LinodeCommand()
     l.get_label(int(sys.argv[1]))
 
-        
+

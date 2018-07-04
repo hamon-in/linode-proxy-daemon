@@ -35,15 +35,15 @@ backend rotateproxy
         mode http
         balance roundrobin
         cookie proxycookie insert indirect nocache
-        
+
         # Squid-farm configuration
 %(squid_config)s
 
 
-listen admin_stats 
+listen admin_stats
         bind  0.0.0.0:8080
         mode  http
         stats uri       /stats
         stats realm     Global\ statistics
-        stats auth ubuntu:adG3Hj09l<}
+        stats auth ubuntu:ubuntu
         option contstats
