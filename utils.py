@@ -159,7 +159,13 @@ class LiCommand(object):
 
     def list_instances(self):
 
-        return = self.client.linode.instances(Instance.group == self.config.group)
+        instances = self.client.linode.instances()
+
+        proxy_list = list()
+
+        for li in instances:
+            if li.group == self.config.group:
+                proxy_list.append(li)
 
 
     def get_label(self, linode_id):
