@@ -408,9 +408,9 @@ class ProxyRotator(object):
                 # Get its label and assign it to the new linode
                 print 'Assigning label',proxy_out_label,'to new linode',proxy_id
                 time.sleep(5)
-                self.linode_cmd.linode_update(int(proxy_id),
-                                            proxy_out_label,
-                                            self.config.group)
+                #self.linode_cmd.linode_update(int(proxy_id),
+                #                            proxy_out_label,
+                #                            self.config.group)
 
         # Post process the host
         print 'Post-processing',new_proxy,'...'
@@ -522,7 +522,7 @@ class ProxyRotator(object):
 
         proxies = list()
         for item in proxies_list:
-            proxies.append(",".join(item.ipv4[0], item.region.id, item.id,0,0))
+            proxies.append(",".join((str(item.ipv4[0]), str(item.region.id), str(item.id),str(0),str(0))))
 
         print >> open('proxies.list', 'w'), '\n'.join(proxies)
         print 'Saved current proxy configuration to proxies.list'
@@ -686,7 +686,15 @@ if __name__ == "__main__":
     if args.writeconfig:
         # Load current proxies config and write proxies.list file
         if rotator.config.vps_provider == 'linode':
-            print >> open('proxies.list', 'w'), rotator.linode_cmd.linode_list_proxies().strip()
+
+            proxies_list = rotator.linode_cmd.list_instances()
+            proxies = list()
+            for item in proxies_list:
+                proxies.append(",".join((str(item.ipv4[0]), str(item.region.id), str(item.id),str(0),str(0))))
+
+            print >> open('proxies.list', 'w'), '\n'.join(proxies)
+
+
         elif rotator.config.vps_provider == 'aws':
             print >> open('proxies.list', 'w'), '\n'.join(rotator.aws_command.list_proxies())
         print 'Saved current proxy configuration to proxies.list'

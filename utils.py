@@ -151,7 +151,7 @@ class LiCommand(object):
             chosen_region = self.available_regions[0]
         new_linode, password = self.client.linode.instance_create(ltype=self.config.plan,
                                                     region = chosen_region,
-                                                    image = 'linode/debian9',
+                                                    image = self.config.image_id,
                                                     group = self.config.group)
 
         return new_linode, password
@@ -166,6 +166,8 @@ class LiCommand(object):
         for li in instances:
             if li.group == self.config.group:
                 proxy_list.append(li)
+
+        return proxy_list
 
 
     def get_label(self, linode_id):
@@ -191,8 +193,9 @@ class LiCommand(object):
 class AWSCommand(object):
     '''Class encapsulating the aws ec2 API'''
     def __init__(self, config=None):
-        self.ec2 = boto3.resource('ec2')
+        #self.ec2 = boto3.resource('ec2')
         self.config = config
+        self.ec2 = None
 
     def create_ec2(self, **params):
         return self.ec2.create_instances(MaxCount=1, MinCount=1, **params)[0]
