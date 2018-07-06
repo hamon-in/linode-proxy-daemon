@@ -394,7 +394,7 @@ class ProxyRotator(object):
                     if self.config.vps_provider == 'linode':
                         proxy_out_label = self.linode_cmd.get_label(proxy_out_id)
                         print 'Removing switched out linode',proxy_out_id
-                        self.linode_cmd.delete_linode(proxy_out_id)
+                        self.linode_cmd.delete_linode(int(proxy_out_id))
                     elif self.config.vps_provider == 'aws':
                         print 'Removing switched out aws instance',proxy_out_id
                         self.aws_command.delete_ec2(proxy_out_id)
