@@ -28,6 +28,8 @@ defaults
 frontend localproxy
         bind *:5729
         mode http
+        acl network_allowed src x.x.x.x
+        http-request deny if !network_allowed
         option http-keep-alive
         default_backend rotateproxy
 
