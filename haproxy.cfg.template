@@ -28,7 +28,7 @@ defaults
 frontend localproxy
         bind *:5729
         mode http
-        acl network_allowed src x.x.x.x
+        acl network_allowed src 202.83.43.140 54.242.97.200
         http-request deny if !network_allowed
         option http-keep-alive
         default_backend rotateproxy
@@ -47,5 +47,5 @@ listen admin_stats
         mode  http
         stats uri       /stats
         stats realm     Global\ statistics
-        stats auth ubuntu:ubuntu
+        stats auth ubuntu:5pxYo6sHyEEOcXTP/2iRY1QAvo
         option contstats

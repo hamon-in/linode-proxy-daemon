@@ -56,7 +56,7 @@ def drop_privileges(uid_name='alpha', gid_name='alpha'):
     # Ensure a very conservative umask
     old_umask = os.umask(077)
 
-def daemonize(pidfile, logfile=None, user='ubuntu', drop=True):
+def daemonize(pidfile, logfile=None, user='root', drop=True):
     """ Make a daemon with the given pidfile and optional logfile """
 
     # Disconnect from controlling TTY as a service

@@ -378,7 +378,7 @@ class ProxyRotator(object):
                                                         input_region=region)
 
         # Switch in the new proxy
-        self.config.switch_in_proxy(new_proxy, proxy_id, 0)
+        self.config.switch_in_proxy(new_proxy, proxy_id,"us-central")
         print 'Switched in new proxy',new_proxy
         # Write configuration
         self.config.write()
@@ -395,6 +395,17 @@ class ProxyRotator(object):
                         proxy_out_label = self.linode_cmd.get_label(proxy_out_id)
                         print 'Removing switched out linode',proxy_out_id
                         self.linode_cmd.delete_linode(int(proxy_out_id))
+			print 'Removing ',proxy_out,'from dictionary'
+                        del self.config.proxy_dict[proxy_out]
+                        del self.config.proxy_state[proxy_out]
+                        self.linode_cmd.delete_linode(proxy_out_id)
+
+                        print "current active proxies => ", self.config.proxy_dict
+
+                        self.config.write()
+                        self.config.write_lb_config()
+                        self.config.reload_lb()
+
                     elif self.config.vps_provider == 'aws':
                         print 'Removing switched out aws instance',proxy_out_id
                         self.aws_command.delete_ec2(proxy_out_id)
@@ -420,12 +431,12 @@ class ProxyRotator(object):
     def send_email(self, proxy_out, label, proxy_in, region):
         """ Send email upon switching of a proxy """
 
-        print 'Sending email...'
-        region = region_dict[region]
-        content = email_template % locals()
-        email_config = self.config.get_email_config()
+        print 'Sending email skipped'
+        #region = region_dict[region]
+        #content = email_template % locals()
+        #email_config = self.config.get_email_config()
 
-        email_report.email_report(email_config, "%s", content)
+        #email_report.email_report(email_config, "%s", content)
 
     def post_process(self, ip):
         """ Post-process a switched-in host """
