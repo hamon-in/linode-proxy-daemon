@@ -4,9 +4,11 @@ import os
 import sys
 import pwd
 import uuid
+import random
 import functools
 import boto3
 from linode_api4 import LinodeClient
+from linode_api4.errors import ApiError
 
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
@@ -147,12 +149,23 @@ class LiCommand(object):
         self.images = self.client.images()
 
     def create_li(self, chosen_region = None):
-        if not chosen_region:
-            chosen_region = self.available_regions[0]
-        new_linode, password = self.client.linode.instance_create(ltype=self.config.plan,
+
+        while True:
+
+
+            if not chosen_region:
+                reg_index = random.randint(0,5)
+                chosen_region = self.available_regions[reg_index]
+
+            try:
+                new_linode, password = self.client.linode.instance_create(ltype=self.config.plan,
                                                     region = chosen_region,
                                                     image = self.config.image_id,
                                                     group = self.config.group)
+            except ApiError() as e:
+                print e
+                continue
+            break
 
         return new_linode, password
 

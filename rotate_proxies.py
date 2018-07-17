@@ -340,12 +340,13 @@ class ProxyRotator(object):
         ip = new_linode.ipv4[0]
         # Proxy ID
         pid = new_linode.id
+        new_region = new_linode.region.id
         print 'I.P address of new linode is',ip
         print 'ID of new linode is',pid
         # Post process the host
         print 'Post-processing',ip,'...'
         self.post_process(ip)
-        return ip, pid
+        return ip, pid, new_region
 
     def rotate(self, region=None):
         """ Rotate the configuration to a new node """
@@ -360,7 +361,7 @@ class ProxyRotator(object):
 
         if self.config.vps_provider == 'linode':
         # Switch in the new linode from this region
-            new_proxy, proxy_id = self.make_new_linode(region)
+            new_proxy, proxy_id, new_region = self.make_new_linode(region)
 
         elif self.config.vps_provider == 'aws':
         # Switch in the new aws instance
@@ -378,7 +379,7 @@ class ProxyRotator(object):
                                                         input_region=region)
 
         # Switch in the new proxy
-        self.config.switch_in_proxy(new_proxy, proxy_id,"us-central")
+        self.config.switch_in_proxy(new_proxy, proxy_id, new_region)
         print 'Switched in new proxy',new_proxy
         # Write configuration
         self.config.write()
@@ -505,7 +506,7 @@ class ProxyRotator(object):
                 # Do a round-robin on regions
                 region = self.config.region_ids[idx % len(self.config.region_ids) ]
                 try:
-                    ip, lid = self.make_new_linode(region)
+                    ip, lid, new_region = self.make_new_linode(region)
                     # self.linode_cmd.linode_update(int(lid),
                     #                             self.config.proxy_prefix + str(i+1),
                     #                             self.config.group)
@@ -545,7 +546,7 @@ class ProxyRotator(object):
         region = self.pick_region()
         print 'Rotating proxy to new region',region,'...'
         # Make a test IP
-        new_proxy, proxy_id = self.make_new_linode(region, test=True)
+        new_proxy, proxy_id, new_region = self.make_new_linode(region, test=True)
         proxy_out = self.config.get_proxy_for_rotation(least_used=True, region_switch=True,
                                                        input_region=region)
 
