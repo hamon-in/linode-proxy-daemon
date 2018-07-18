@@ -56,6 +56,8 @@ post_process_cmd_template = """ssh -o StrictHostKeyChecking=no -o UserKnownHosts
 iptables_restore_cmd = "sudo iptables-restore < /etc/iptables.rules"
 squid_restart_cmd = "sudo squid3 -f /etc/squid3/squid.conf"
 
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
 class ProxyConfig(object):
     """ Class representing configuration of crawler proxy infrastructure """
 
@@ -443,10 +445,11 @@ class ProxyRotator(object):
         """ Post-process a switched-in host """
 
         # Sleep a bit before sshing
-        time.sleep(5)
-        cmd = post_process_cmd_template % (self.config.user, ip, iptables_restore_cmd)
-        print 'SSH command 1=>',cmd
-        os.system(cmd)
+        time.sleep(7)
+        #cmd = post_process_cmd_template % (self.config.user, ip, iptables_restore_cmd)
+        #print 'SSH command 1=>',cmd
+        #os.system(cmd)
+        print "skipping ip tables restore command"
         cmd = post_process_cmd_template % (self.config.user, ip, squid_restart_cmd)
         print 'SSH command 2=>',cmd
         os.system(cmd)

@@ -154,8 +154,11 @@ class LiCommand(object):
 
 
             if not chosen_region:
-                reg_index = random.randint(0,5)
-                chosen_region = self.available_regions[reg_index]
+                if self.config.region_number != "" and int(self.config.region_number) >= 0 and int(self.config.region_number) <= 7:
+                    chosen_region = self.available_regions[int(self.config.region_number)]
+                else:
+                    reg_index = random.randint(0,7)
+                    chosen_region = self.available_regions[reg_index]
 
             try:
                 new_linode, password = self.client.linode.instance_create(ltype=self.config.plan,
