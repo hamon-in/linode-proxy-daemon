@@ -302,6 +302,7 @@ class ProxyRotator(object):
         if rotate:
             print 'Rotating a node'
             self.rotate(region=region)
+            sys.exit(0)
 
         signal.signal(signal.SIGTERM, self.sighandler)
         signal.signal(signal.SIGUSR1, self.sighandler)
