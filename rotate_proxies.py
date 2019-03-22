@@ -446,7 +446,7 @@ class ProxyRotator(object):
         """ Post-process a switched-in host """
 
         # Sleep a bit before sshing
-        time.sleep(7)
+        time.sleep(30)
         #cmd = post_process_cmd_template % (self.config.user, ip, iptables_restore_cmd)
         #print 'SSH command 1=>',cmd
         #os.system(cmd)
