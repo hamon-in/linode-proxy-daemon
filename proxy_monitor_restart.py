@@ -12,6 +12,7 @@ import utils
 server_re = re.compile(r'server\s+([a-zA-Z0-9]+)\s+(\d+\.\d+\.\d+\.\d+)\:(\d+)*')
 network_test_cmd = 'nc %s %d -w 5 -zv 2>/dev/null'
 squid_restart_cmd = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@%s "sudo squid3 -f /etc/squid3/squid.conf"'
+squid_config_copy_cmd_template = """scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null squid.conf root@%s: """
 
 def parse_config(filename='/etc/haproxy/haproxy.cfg'):
     """ Parse HAproxy configuration file """
@@ -31,10 +32,12 @@ def parse_config(filename='/etc/haproxy/haproxy.cfg'):
             cmd = network_test_cmd % (ip_address, int(port))
             if os.system(cmd) != 0:
                 # This squid instance is down
-                cmd = squid_restart_cmd % ip_address
-                print 'Restarting squid on',ip_address,'...'
-                if os.system(cmd) == 0:
-                    restarted[ip_address] = 1
+                cmd = squid_config_copy_cmd_template % ip_address
+                if os.system(cmd) != 0:
+                    cmd = squid_restart_cmd % ip_address
+                    print 'Restarting squid on',ip_address,'...'
+                    if os.system(cmd) == 0:
+                        restarted[ip_address] = 1
 
     print 'Restarted',len(restarted),'squid instances.'
 

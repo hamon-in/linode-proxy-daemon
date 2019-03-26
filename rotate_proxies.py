@@ -55,6 +55,7 @@ Region: %(region)s
 post_process_cmd_template = """ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@%s "%s" """
 iptables_restore_cmd = "sudo iptables-restore < /etc/iptables.rules"
 squid_restart_cmd = "sudo squid3 -f /etc/squid3/squid.conf"
+squid_config_copy_cmd_template = """scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null squid.conf %s@%s: """
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -447,9 +448,9 @@ class ProxyRotator(object):
 
         # Sleep a bit before sshing
         time.sleep(60)
-        #cmd = post_process_cmd_template % (self.config.user, ip, iptables_restore_cmd)
-        #print 'SSH command 1=>',cmd
-        #os.system(cmd)
+        cmd = squid_config_copy_cmd_template % (self.config.user, ip)
+        print 'SSH command 1=>',cmd
+        os.system(cmd)
         print "skipping ip tables restore command"
         cmd = post_process_cmd_template % (self.config.user, ip, squid_restart_cmd)
         print 'SSH command 2=>',cmd
