@@ -23,18 +23,24 @@ defaults
     errorfile 502 /etc/haproxy/errors/502.http
     errorfile 503 /etc/haproxy/errors/503.http
     errorfile 504 /etc/haproxy/errors/504.http
+# User and password
+userlist crawler
+	user root insecure-password gu5LDMa2YoJAhUeOpIhHd4FB
 
 # reverse proxy-squid
 frontend localproxy
         bind *:5729
         mode http
-        acl network_allowed src 183.82.121.231 34.229.150.161 202.83.43.207 18.217.238.167
-        http-request deny if !network_allowed
+ 	#acl user_auth http_auth(crawler)
+	#http-request auth realm crawl unless user_auth
+	http-request allow
         option http-keep-alive
         default_backend rotateproxy
 
 backend rotateproxy
         mode http
+	#acl user_auth http_auth(crawler)
+	#http-request auth realm crawl unless user_auth
         balance roundrobin
         cookie proxycookie insert indirect nocache
 
