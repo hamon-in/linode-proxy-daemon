@@ -23,9 +23,6 @@ defaults
     errorfile 502 /etc/haproxy/errors/502.http
     errorfile 503 /etc/haproxy/errors/503.http
     errorfile 504 /etc/haproxy/errors/504.http
-# User and password
-userlist crawler
-	user root insecure-password gu5LDMa2YoJAhUeOpIhHd4FB
 
 # reverse proxy-squid
 frontend localproxy
